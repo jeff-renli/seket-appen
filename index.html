@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d32">
+  <meta name="description" content="Enkel bemanning av sekretariatsuppdrag för HV71 U15P.">
+  <title>Seket appen | HV71 U15P</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #101d32;
+      --navy-soft: #1b2c47;
+      --gold: #f0bf50;
+      --gold-soft: #fff4d8;
+      --ink: #17243a;
+      --muted: #718096;
+      --line: #e4e9f0;
+      --paper: #ffffff;
+      --canvas: #f3f5f8;
+      --green: #237b5c;
+      --red: #ad4646;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background: var(--canvas);
+      color: var(--ink);
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      background: var(--navy);
+      color: white;
+    }
+
+    .masthead::after {
+      position: absolute;
+      right: -80px;
+      bottom: -180px;
+      width: 430px;
+      height: 430px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 50%;
+      box-shadow: 0 0 0 34px rgba(255,255,255,.025), 0 0 0 68px rgba(255,255,255,.02);
+      content: "";
+      pointer-events: none;
+    }
+
+    .masthead-inner, main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .masthead-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      min-height: 158px;
+      padding: 27px 0;
+    }
+
+    .crest {
+      display: grid;
+      flex: 0 0 72px;
+      width: 72px;
+      height: 82px;
+      align-content: center;
+      justify-items: center;
+      border: 2px solid var(--gold);
+      border-radius: 20px 20px 27px 27px;
+      background: linear-gradient(145deg, #1d3657, #0b1525);
+      box-shadow: inset 0 0 0 4px rgba(240,191,80,.11);
+      transform: rotate(-3deg);
+    }
+
+    .crest strong {
+      color: var(--gold);
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: -.08em;
+      line-height: 1;
+      transform: rotate(3deg);
+    }
+
+    .crest span {
+      margin-top: 5px;
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      transform: rotate(3deg);
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(29px, 5vw, 42px);
+      letter-spacing: -.045em;
+      line-height: 1.05;
+    }
+
+    .masthead p:last-child {
+      margin: 8px 0 0;
+      color: #b7c3d4;
+      font-size: 14px;
+    }
+
+    main { padding: 25px 0 48px; }
+
+    .intro {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 17px;
+    }
+
+    .intro h2 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -.025em;
+    }
+
+    .intro p {
+      max-width: 450px;
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .storage-note {
+      color: var(--muted);
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .auth-card {
+      max-width: 610px;
+      margin: 0 auto 18px;
+    }
+
+    .auth-content { padding: 0 20px 20px; }
+    .auth-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .auth-help {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .account-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      margin: 0 0 15px;
+    }
+
+    .account-email {
+      overflow: hidden;
+      margin-right: auto;
+      color: var(--muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .auth-card[hidden], .account-bar[hidden], .layout[hidden] { display: none; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(290px, .85fr);
+      align-items: start;
+      gap: 18px;
+    }
+
+    .column { display: grid; gap: 18px; min-width: 0; }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
+      box-shadow: 0 5px 18px rgba(16,29,50,.045);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 20px 14px;
+    }
+
+    .card-head h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: -.02em;
+    }
+
+    .card-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .card-body { padding: 0 20px 20px; }
+
+    .match-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 2px 0 17px;
+    }
+
+    label.field {
+      display: grid;
+      gap: 6px;
+      color: #4a5870;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field input, .add-form input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid #dce2eb;
+      border-radius: 9px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .field input:focus, .add-form input:focus {
+      border-color: #9daec4;
+      box-shadow: 0 0 0 3px rgba(34,63,101,.09);
+    }
+
+    .section-rule {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 0 9px;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-rule strong { font-size: 13px; }
+    .section-rule small { color: var(--muted); font-size: 11px; }
+    .text-actions { display: flex; gap: 10px; }
+
+    .link-button {
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      color: #36577f;
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .link-button:hover { color: var(--navy); text-decoration: underline; }
+
+    .parent-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      min-height: 25px;
+    }
+
+    .parent-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      min-height: 41px;
+      padding: 7px 8px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+    }
+
+    .parent-row.selected {
+      border-color: #c4d9d0;
+      background: #f4faf7;
+    }
+
+    .parent-row input {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      accent-color: var(--green);
+    }
+
+    .parent-name {
+      overflow: hidden;
+      flex: 1;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-parent {
+      width: 25px;
+      height: 25px;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: #98a2b1;
+      font-size: 17px;
+      line-height: 1;
+    }
+    .remove-parent:hover { background: #fbeeee; color: var(--red); }
+
+    .empty-copy {
+      grid-column: 1 / -1;
+      margin: 2px 0 7px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .add-form input { min-width: 0; min-height: 39px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 39px;
+      padding: 9px 14px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+      transition: transform .12s ease, background .12s ease;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button:active { transform: translateY(0); }
+    .button:focus-visible, .link-button:focus-visible, .remove-parent:focus-visible {
+      outline: 3px solid rgba(49,91,143,.32);
+      outline-offset: 2px;
+    }
+
+    .button-add {
+      flex: 0 0 auto;
+      min-width: 74px;
+      border-color: #dce2eb;
+      background: #fff;
+      color: var(--navy);
+    }
+    .button-add:hover { background: #f5f7fa; }
+
+    .button-primary {
+      min-height: 47px;
+      padding: 12px 18px;
+      background: var(--navy);
+      color: white;
+      font-size: 13px;
+    }
+    .button-primary:hover { background: var(--navy-soft); }
+
+    .draw-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 15px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .draw-hint { color: var(--muted); font-size: 11px; line-height: 1.45; }
+
+    .notice {
+      margin: 0 0 15px;
+      padding: 10px 12px;
+      border: 1px solid #eed596;
+      border-radius: 9px;
+      background: var(--gold-soft);
+      color: #624b19;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .notice[hidden] { display: none; }
+    .notice.error { border-color: #ebc4c4; background: #fff1f1; color: #873333; }
+
+    .role-list { display: grid; gap: 8px; }
+    .role-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-height: 58px;
+      padding: 8px 11px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .role-item.open { border-style: dashed; background: #fafbfd; }
+    .role-icon {
+      display: grid;
+      flex: 0 0 36px;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 9px;
+      background: #eef2f8;
+      color: #344967;
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: .04em;
+    }
+    .role-item > div {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .role-name { font-size: 12px; font-weight: 750; }
+    .role-person { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .role-status {
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+    .role-item.open .role-status { color: #8a6c2b; }
+
+    .role-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .edit-assignment {
+      padding: 4px 8px;
+      border: 1px solid #d0d8e4;
+      border-radius: 6px;
+      background: #f8f9fb;
+      color: #3c5283;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .edit-assignment:hover { background: #eef2f9; border-color: #b8c4d9; }
+    .edit-assignment:active { background: #e5ecf5; }
+
+    .result-meta {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .result-empty {
+      padding: 21px 14px;
+      border: 1px dashed #dce2eb;
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .count-pill {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 20px;
+      background: #eef2f7;
+      color: #53647b;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .parent-stats { display: grid; gap: 2px; }
+    .stat-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 37px;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .stat-row:last-child { border-bottom: 0; }
+    .stat-row span:first-child {
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .stat-detail { color: var(--muted); font-size: 10px; text-align: right; white-space: nowrap; }
+    .empty-state { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .history-list { display: grid; gap: 8px; }
+    .history-item {
+      padding: 10px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+    }
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .history-date { color: var(--muted); font-size: 10px; font-weight: 550; white-space: nowrap; }
+    .history-assignments { margin-top: 5px; color: #68768a; font-size: 10px; line-height: 1.5; }
+    
+    .history-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .edit-history, .delete-history {
+      flex: 0 1 auto;
+      padding: 4px 8px;
+      border: 1px solid #d0d8e4;
+      border-radius: 6px;
+      background: #f8f9fb;
+      color: #3c5283;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .12s ease, border-color .12s ease;
+    }
+    .edit-history:hover, .delete-history:hover { background: #eef2f9; border-color: #b8c4d9; }
+    .edit-history:active, .delete-history:active { background: #e5ecf5; }
+    
+    .delete-history { color: #8a5555; }
+    .delete-history:hover { color: #a63d3d; }
+
+    .clear-history { color: #9a5151; }
+
+    .method-note {
+      margin-top: 11px;
+      padding: 10px 11px;
+      border-radius: 9px;
+      background: #f5f7fa;
+      color: #718096;
+      font-size: 10px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 780px) {
+      .layout { grid-template-columns: 1fr; }
+      .column-right { grid-template-columns: 1fr 1fr; align-items: start; }
+      .column-right .card:last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 540px) {
+      .masthead-inner, main { width: min(100% - 24px, 1120px); }
+      .masthead-inner { min-height: 132px; gap: 13px; }
+      .crest { flex-basis: 60px; width: 60px; height: 70px; border-radius: 17px 17px 22px 22px; }
+      .crest strong { font-size: 16px; }
+      .masthead p:last-child { font-size: 12px; }
+      main { padding-top: 19px; }
+      .intro { align-items: start; flex-direction: column; gap: 6px; }
+      .storage-note { text-align: left; }
+      .card-head { padding: 16px 15px 12px; }
+      .card-body { padding: 0 15px 16px; }
+      .match-fields { grid-template-columns: 1fr 1fr; }
+      .parent-list { grid-template-columns: 1fr; }
+      .column-right { grid-template-columns: 1fr; }
+      .column-right .card:last-child { grid-column: auto; }
+      .draw-row { align-items: stretch; flex-direction: column; }
+      .draw-row .button { width: 100%; }
+      .draw-hint { text-align: center; }
+      .auth-content { padding: 0 15px 16px; }
+      .auth-form { grid-template-columns: 1fr; }
+      .auth-form .button { width: 100%; }
+      .account-bar { flex-wrap: wrap; }
+      .account-email { flex-basis: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="crest" aria-label="HV71 U15P">
+        <strong>HV71</strong>
+        <span>U15P</span>
+      </div>
+      <div>
+        <p class="eyebrow">HV71 · U15P</p>
+        <h1>Seket appen</h1>
+        <p>Rättvist fördelade uppdrag. Mer tid till hockey.</p>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="intro">
+      <div>
+        <h2>Bemanna nästa match</h2>
+        <p>Välj vilka som kan hjälpa till och slumpa fram ett lagom rättvist sekretariat.</p>
+      </div>
+      <div class="storage-note">Föräldrar och matchhistorik synkas mellan dina enheter.</div>
+    </div>
+
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section id="auth-card" class="card auth-card" aria-labelledby="login-heading">
+      <div class="card-head">
+        <div>
+          <h3 id="login-heading">Logga in till lagets app</h3>
+          <p>Logga in med e-postadressen och lösenordet för ditt konto.</p>
+        </div>
+      </div>
+      <div class="auth-content">
+        <form id="login-form" class="auth-form">
+          <label class="field" for="login-email">
+            <span>E-postadress</span>
+            <input id="login-email" type="email" autocomplete="email" required placeholder="namn@exempel.se">
+          </label>
+          <label class="field" for="login-password">
+            <span>Lösenord</span>
+            <input id="login-password" type="password" autocomplete="current-password" required>
+          </label>
+          <button id="login-button" class="button button-primary" type="submit">Logga in</button>
+        </form>
+        <p class="auth-help">Konton och lösenord läggs till av lagets administratör i Supabase. Appen skickar inget mejl när du loggar in.</p>
+      </div>
+    </section>
+
+    <div id="account-bar" class="account-bar" hidden>
+      <span id="account-email" class="account-email"></span>
+      <span id="account-team" class="account-email"></span>
+      <button id="refresh-button" class="button button-add" type="button">Synka nu</button>
+      <button id="signout-button" class="button button-add" type="button">Logga ut</button>
+    </div>
+
+    <div id="app-layout" class="layout" hidden>
+      <div class="column">
+        <section class="card" aria-labelledby="match-heading">
+          <div class="card-head">
+            <div>
+              <h3 id="match-heading">Match &amp; tillgänglighet</h3>
+              <p>Markera de föräldrar som är med den här gången.</p>
+            </div>
+            <span class="count-pill" id="available-count">0 tillgängliga</span>
+          </div>
+          <div class="card-body">
+            <div class="match-fields">
+              <label class="field" for="opponent">
+                <span>Motståndare</span>
+                <input id="opponent" name="opponent" type="text" maxlength="60" placeholder="Ex. Frölunda">
+              </label>
+              <label class="field" for="match-date">
+                <span>Matchdatum</span>
+                <input id="match-date" name="match-date" type="date">
+              </label>
+            </div>
+
+            <div class="section-rule">
+              <div>
+                <strong>Vilka kan?</strong>
+                <small id="parent-count"> Lägg till föräldrar här nedan.</small>
+              </div>
+              <div class="text-actions">
+                <button class="link-button" id="select-all" type="button">Välj alla</button>
+                <button class="link-button" id="select-none" type="button">Avmarkera</button>
+              </div>
+            </div>
+
+            <div id="parent-list" class="parent-list"></div>
+
+            <form id="add-parent-form" class="add-form">
+              <input id="parent-name-input" type="text" maxlength="50" autocomplete="name" placeholder="Förälderns namn" aria-label="Förälderns namn" required>
+              <button class="button button-add" type="submit">+ Lägg till</button>
+            </form>
+
+            <div class="draw-row">
+              <div class="draw-hint">Varje person får högst ett uppdrag per match.</div>
+              <button id="draw-button" class="button button-primary" type="button">
+                <span aria-hidden="true">✦</span> Slumpa uppdrag
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="result-heading">
+          <div class="card-head">
+            <div>
+              <h3 id="result-heading">Matchens uppdrag</h3>
+              <p id="result-subtitle">Resultatet visas här när du har lottat.</p>
+            </div>
+          </div>
+          <div id="result" class="card-body">
+            <div class="result-empty">Välj tillgängliga föräldrar och tryck på <strong>Slumpa uppdrag</strong> för att fördela rollerna.</div>
+          </div>
+        </section>
+      </div>
+
+      <div class="column column-right">
+        <section class="card" aria-labelledby="stats-heading">
+          <div class="card-head">
+            <div>
+              <h3 id="stats-heading">Uppdrag hittills</h3>
+              <p>Historiken hjälper lottningen att bli rättvis.</p>
+            </div>
+            <span class="count-pill" id="match-count">0 matcher</span>
+          </div>
+          <div class="card-body">
+            <div id="parent-stats" class="parent-stats"></div>
+            <div class="method-note">OVR, klocka, speaker och matchvärd/fika räknas som 1 poäng vardera. Varje båsdörr räknas som 0,75 poäng.</div>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="history-heading">
+          <div class="card-head">
+            <div>
+              <h3 id="history-heading">Matchhistorik</h3>
+              <p>Senaste lottningarna sparas automatiskt.</p>
+            </div>
+            <button id="clear-history" class="link-button clear-history" type="button" hidden>Rensa</button>
+          </div>
+          <div class="card-body">
+            <div id="history-list" class="history-list"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js"
+    integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O"
+    crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>
